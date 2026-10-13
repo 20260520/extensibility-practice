@@ -1,29 +1,48 @@
 package castle;
-
-public class Room {
-    public String description;
-    public Room northExit;
-    public Room southExit;
-    public Room eastExit;
-    public Room westExit;
-    
-    public Room(String description) 
+class Room {
+    private String description;
+    private Room[] Exits;
+    {
+    Room northExit = null;
+    Room southExit = null;
+    Room eastExit = null;
+    Room westExit = null;
+    Room[] tempExits = {northExit,  eastExit, southExit, westExit};
+    Exits = tempExits;
+    }
+    private String[] directions = {"north", "east", "south", "west"};
+    Room(String description) 
     {
         this.description = description;
     }
-
-    public void setExits(Room north, Room east, Room south, Room west) 
+    void setExits(Room[] input) 
     {
-        if(north != null)
-            northExit = north;
-        if(east != null)
-            eastExit = east;
-        if(south != null)
-            southExit = south;
-        if(west != null)
-            westExit = west;
+        for (byte n = 0; n < (byte)Exits.length; n++) {
+            Exits[n] = input[n];
+        }
     }
-
+    String getExitDesc(){
+        StringBuffer sb =new StringBuffer();
+        byte i = 0;
+        for (Room exit : Exits) {
+            if(exit != null){
+                sb.append(directions[i]+" ");
+            }
+            i++;
+        }
+        return sb.toString();
+    }
+    Room getExit(String selectedDirection){
+        Room nextroom = null;
+        byte n = 0;
+        for (String direction : directions) {
+            if(selectedDirection.equals(direction)){
+                nextroom = Exits[n];
+            }
+            n++;
+        }
+        return nextroom;
+    }
     @Override
     public String toString()
     {
