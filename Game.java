@@ -1,4 +1,6 @@
 package castle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 public class Game {
     private Room currentRoom;
@@ -6,31 +8,41 @@ public class Game {
     {
         createRooms();
     }
+    //---------------------------------------------------------------------------------------------------------------
     private void createRooms()
     {
-        Room[] Exits;
-        Room outside, lobby, pub, study, bedroom;
-      
         //	make room
+        Room outside, lobby, pub, study, bedroom;
         outside = new Room("outside the castle.");
         lobby = new Room("in the lobby");
         pub = new Room("in the pub.");
         study = new Room("in the study.");
         bedroom = new Room("in the bedroom.");
-        
         //	loading the exit of the room
-        Exits = new Room[] {null, lobby, study, pub};
-        outside.setExits(Exits);
-        Exits = new Room[] {null, null, null, outside};
-        lobby.setExits(Exits);
-        Exits = new Room[] {null, outside, null, null};
-        pub.setExits(Exits);
-        Exits = new Room[] {outside, bedroom, null, null};
-        study.setExits(Exits);
-        Exits = new Room[] {null, null, null, study};
-        bedroom.setExits(Exits);
+        List<Room[]> toAddLists = new ArrayList<Room[]>();
+        Room[] toAddList;
+        String[] directions = {null, "north", "east", "south", "west", "up", "down"}; 
+        toAddList = new Room[] {outside, null, lobby, study, pub, null, null};
+        toAddLists.add(toAddList);
+        toAddList = new Room[] {lobby, null, null, null, outside, pub, null};
+        toAddLists.add(toAddList);
+        toAddList = new Room[] {pub, null, outside, null, null, null, lobby};
+        toAddLists.add(toAddList);
+        toAddList = new Room[] {study, outside, bedroom, null, null, null};
+        toAddLists.add(toAddList);
+        toAddList = new Room[] {bedroom, null, null, null, study, null};
+        toAddLists.add(toAddList);
+        AUTOloader(toAddLists, directions);
         currentRoom = outside;  //	the game begin outside the castle
     }
+    private void AUTOloader(List<Room[]> toAddLists, String[] directions){
+        for(Room[] toAddList : toAddLists){
+            for(byte n = 1; n < toAddList.length; n++){
+                toAddList[0].set1Exit(directions[n], toAddList[n]);
+            }
+        }
+    }
+    //---------------------------------------------------------------------------------------------------------------
     private void printWelcome() {
         System.out.println();
         System.out.println("Welcome!");
@@ -41,7 +53,6 @@ public class Game {
     }
 
     // User command
-
     private void printHelp() 
     {
         System.out.print("Do you lose? you can try three commands: go bye help");
@@ -49,7 +60,7 @@ public class Game {
     }
     private void goRoom(String direction) 
     {
-        Room nextRoom = currentRoom.getExit(direction);
+        Room nextRoom = currentRoom.get1Exit(direction);
         if (nextRoom == null) {
             System.out.println("wrong direction");
         }else {
@@ -60,7 +71,7 @@ public class Game {
     void showPrompt(){
             System.out.println("现在你在" + currentRoom);
             System.out.print("出口有: ");
-            System.out.println(currentRoom.getExitDesc());
+            System.out.println(currentRoom.getExistingExits());
             System.out.println();
         }
 	public static void main(String[] args) {
