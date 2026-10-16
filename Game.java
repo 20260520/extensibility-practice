@@ -1,9 +1,12 @@
 package castle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 public class Game {
     private Room currentRoom;
+    Map<String, CommandsResolver> commandresolvers = new HashMap<String, CommandsResolver>();
     public Game() 
     {
         createRooms();
@@ -28,9 +31,9 @@ public class Game {
         toAddLists.add(toAddList);
         toAddList = new Room[] {pub, null, outside, null, null, null, lobby};
         toAddLists.add(toAddList);
-        toAddList = new Room[] {study, outside, bedroom, null, null, null};
+        toAddList = new Room[] {study, outside, bedroom, null, null, null, null};
         toAddLists.add(toAddList);
-        toAddList = new Room[] {bedroom, null, null, null, study, null};
+        toAddList = new Room[] {bedroom, null, null, null, study, null, null};
         toAddLists.add(toAddList);
         AUTOloader(toAddLists, directions);
         currentRoom = outside;  //	the game begin outside the castle
@@ -53,12 +56,13 @@ public class Game {
     }
 
     // User command
-    private void printHelp() 
+    void printHelp() 
     {
-        System.out.print("Do you lose? you can try three commands: go bye help");
+        System.out.print("Do you lose? you can try 2 commands: go help");
         System.out.println("such as: \tgo east");
+        System.out.println("input 'quit' or 'exit' to END this program");
     }
-    private void goRoom(String direction) 
+    void goRoom(String direction) 
     {
         Room nextRoom = currentRoom.get1Exit(direction);
         if (nextRoom == null) {
@@ -69,32 +73,29 @@ public class Game {
         }
     }    
     void showPrompt(){
-            System.out.println("现在你在" + currentRoom);
-            System.out.print("出口有: ");
-            System.out.println(currentRoom.getExistingExits());
-            System.out.println();
-        }
+        System.out.println("You are now " + currentRoom);
+        System.out.print("Exits: ");
+        System.out.println(currentRoom.getExistingExits());
+        System.out.println();
+    }
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		Game game = new Game();
+		game.commandresolvers.put("help", new Help(game));
+		game.commandresolvers.put("go", new Go(game));
 		game.printWelcome();
-        while ( true ) {
+        while(true){
         	String line = in.nextLine();
         	String[] words = line.split(" ");
-        	if ( words[0].equals("help") ) {
-        		game.printHelp();
-        	} else if (words[0].equals("go") ) {
-        		if ( words.length < 2 || words[1].isEmpty() ) {
-        	    	System.out.println("go 后面需要跟方向,例如:go east");
-        		}else{
-        			game.goRoom(words[1]);
-        		}
-        	} else if ( words[0].equals("bye") ) {
+        	CommandsResolver cr = game.commandresolvers.get(words[0]);
+        	if ( cr != null ) {
+        		cr.Resolver(words);
+        	}
+        	if ( words[0].equals("exit") || words[0].equals("quit")) {
         		break;
         	}
         }
         System.out.println("see you again!");
         in.close();
 	}
-
 }
